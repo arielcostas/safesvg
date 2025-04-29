@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <OutputType>Library</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <RootNamespace>Costasdev.SafeSvg</RootNamespace>
+
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+        <PackageId>Costasdev.SafeSvg</PackageId>
+        <Authors>Ariel Costas Guerrero</Authors>
+        <Description>Simple SVG sanitizer for .NET</Description>
+        <Copyright>Copyright (c) 2025 Ariel Costas Guerrero</Copyright>
+        <PackageProjectUrl>https://github.com/arielcostas/safesvg</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/arielcostas/safesvg</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>svg sanitizer xml</PackageTags>
+        <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+
+</Project>

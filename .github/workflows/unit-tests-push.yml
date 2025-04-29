@@ -1,0 +1,45 @@
+name: Run MSTest Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency: 
+  group: 'unit-tests-push'
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: "Run Unit Tests on .NET ${{ matrix.dotnet-version }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [9.x, 8.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release --logger trx
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults-${{ matrix.dotnet-version }}
+          path: '**/*.trx'

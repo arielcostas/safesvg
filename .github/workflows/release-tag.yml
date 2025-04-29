@@ -32,10 +32,10 @@ jobs:
         run: dotnet restore
 
       - name: Build project
-        run: dotnet build --configuration Release --no-restore ./src/Costasdev.SafeSvg/Costasdev.SafeSvg.csproj
+        run: dotnet build --configuration Release ./src/Costasdev.SafeSvg/Costasdev.SafeSvg.csproj
 
       - name: Run tests
-        run: dotnet test --no-build --configuration Release
+        run: dotnet test --configuration Release
 
       - name: Package NuGet
         run: |

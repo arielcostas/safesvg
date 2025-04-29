@@ -2,6 +2,6 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAssert_002Ecs_002Fl_003AC_0021_003FUsers_003Fariel_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FSourcesCache_003Fcbd51ded3de5a42d033a566294ae8a738f26b5d64a542e44282caacad314f_003FAssert_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f33e8e79_002D3944_002D46ab_002D8d4a_002D9da8fb9e2eba/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SanitiserTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;MSTest::A73F5AAE-4AF8-91AC-DFF5-6EB7B7075FC8::net9.0::Costasdev.SafeSvg.Tests.SanitiserTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::A73F5AAE-4AF8-91AC-DFF5-6EB7B7075FC8::net8.0::Costasdev.SafeSvg.Tests.SanitiserTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

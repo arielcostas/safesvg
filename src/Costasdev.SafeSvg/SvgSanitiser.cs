@@ -22,7 +22,7 @@ public abstract class SvgSanitiser
     [
         "id", "class", "d", "cx", "cy", "r", "x", "y", "width", "height",
         "fill", "stroke", "stroke-width", "transform", "font-size", "font-family",
-        "text-anchor"
+        "text-anchor", "viewBox", "preserveAspectRatio", "style", "opacity"
     ];
 
     private const string AllowedSvgNamespace = "http://www.w3.org/2000/svg";

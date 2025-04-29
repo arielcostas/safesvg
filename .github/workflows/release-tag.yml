@@ -8,6 +8,12 @@ on:
   push:
     tags:
       - "*.*.*"
+  workflow_dispatch:
+    inputs:  
+      version:
+        description: 'Version to release'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -29,10 +35,16 @@ jobs:
         run: dotnet build --configuration Release --no-restore ./src/Costasdev.SafeSvg/Costasdev.SafeSvg.csproj
 
       - name: Run tests
-        run: dotnet test --configuration Release --no-build ./src/Costasdev.SafeSvg.Tests/Costasdev.SafeSvg.Tests.csproj
+        run: dotnet test --no-build --configuration Release
 
       - name: Package NuGet
-        run: dotnet pack src/Costasdev.SafeSvg/Costasdev.SafeSvg.csproj --configuration Release --output ./packages -p:PackageVersion=${{ github.ref_name }} --no-build
+        run: |
+          VERSION=${{ inputs.version || github.ref_name }}
+          dotnet pack src/Costasdev.SafeSvg/Costasdev.SafeSvg.csproj \
+            --configuration Release \
+            --output ./packages \
+            -p:PackageVersion=$VERSION \
+            --no-build
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
@@ -60,10 +72,19 @@ jobs:
           path: ./packages
 
       - name: Publish package to NuGet
-        run: dotnet nuget push ./packages/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
-        
+        run: |
+          VERSION=${{ inputs.version || github.ref_name }}
+          dotnet nuget push ./packages/*.nupkg \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }}
+
       - name: Publish symbols to NuGet
-        run: dotnet nuget push ./packages/*.snupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        run: |
+          VERSION=${{ inputs.version || github.ref_name }}
+          dotnet nuget push ./packages/*.snupkg \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --skip-duplicate
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

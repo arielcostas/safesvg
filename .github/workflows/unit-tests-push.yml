@@ -30,7 +30,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore src/Costasdev.SafeSvg.Tests/Costasdev.SafeSvg.Tests.csproj
 
       - name: Build solution
         run: dotnet build --no-restore --configuration Release

@@ -1,4 +1,0 @@
-﻿<Solution>
-  <Project Path="src\Costasdev.SafeSvg\Costasdev.SafeSvg.csproj" />
-  <Project Path="src\Costasdev.SafeSvg.Tests\Costasdev.SafeSvg.Tests.csproj" />
-</Solution>

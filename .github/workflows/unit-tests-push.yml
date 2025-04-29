@@ -14,11 +14,11 @@ concurrency:
 
 jobs:
   test:
-    name: "Run Unit Tests on .NET ${{ matrix.dotnet-version }}"
+    name: "Run Unit Tests on .NET ${{ matrix.dotnet }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: [9.x, 8.x]
+        dotnet: [9.x, 8.x]
 
     steps:
       - name: Checkout code
@@ -27,13 +27,13 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: ${{ matrix.dotnet }}
 
       - name: Restore dependencies
         run: dotnet restore src/Costasdev.SafeSvg.Tests/Costasdev.SafeSvg.Tests.csproj
 
       - name: Build solution
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release src/Costasdev.SafeSvg.Tests/Costasdev.SafeSvg.Tests.csproj
 
       - name: Run tests
         run: dotnet test --no-build --configuration Release --logger trx
@@ -41,5 +41,5 @@ jobs:
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
-          name: TestResults-${{ matrix.dotnet-version }}
+          name: TestResults-${{ matrix.dotnet }}
           path: '**/*.trx'

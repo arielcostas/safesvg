@@ -21,11 +21,12 @@ public abstract class SvgSanitiser
     private static readonly string[] AllowedSvgAttributes =
     [
         "id", "class", "d", "cx", "cy", "r", "x", "y", "width", "height",
-        "fill", "stroke", "stroke-width", "transform", "font-size", "font-family",
+        "fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin",
+        "transform", "font-size", "font-family",
         "text-anchor", "viewBox", "preserveAspectRatio", "style", "opacity"
     ];
 
-    private const string AllowedSvgNamespace = "http://www.w3.org/2000/svg";
+    private const string SvgStandardNamespace = "http://www.w3.org/2000/svg";
 
     /// <summary>
     /// Sanitises the input SVG content by removing any disallowed elements and attributes,
@@ -63,46 +64,19 @@ public abstract class SvgSanitiser
             return null;
         }
 
-        // Remove all elements and attributes that are not allowed
-        foreach (XmlNode node in doc.DocumentElement.ChildNodes)
-        {
-            if (node is not XmlElement element)
-            {
-                continue;
-            }
-
-            if (!AllowedSvgTags.Contains(element.LocalName))
-            {
-                doc.DocumentElement.RemoveChild(node);
-                continue;
-            }
-
-            var attributesInElementToRemove = new List<XmlAttribute>();
-            foreach (XmlAttribute attribute in element.Attributes)
-            {
-                if (!AllowedSvgAttributes.Contains(attribute.LocalName))
-                {
-                    attributesInElementToRemove.Add(attribute);
-                }
-            }
-            
-            foreach (XmlAttribute attribute in attributesInElementToRemove)
-            {
-                element.Attributes.Remove(attribute);
-            }
-        }
+        SanitizeSvgElementContent(doc);
 
         // Remove all attributes that are not allowed from the root element
         List<XmlAttribute> attributesToRemove = [];
         foreach (XmlAttribute attribute in doc.DocumentElement.Attributes)
         {
             // If the attribute is the SVG namespace, leave it
-            if (attribute.Name == "xmlns" && attribute.Value == AllowedSvgNamespace)
+            if (attribute.Name == "xmlns" && attribute.Value == SvgStandardNamespace)
             {
                 continue;
             }
             
-            if (attribute.Prefix == "xmlns" && attribute.Value != AllowedSvgNamespace)
+            if (attribute.Prefix == "xmlns" && attribute.Value != SvgStandardNamespace)
             {
                 attributesToRemove.Add(attribute);
             }
@@ -121,7 +95,10 @@ public abstract class SvgSanitiser
         // If the SVG namespace is not defined, add it
         if (options.AddNamespace && !doc.DocumentElement.HasAttribute("xmlns"))
         {
-            doc.DocumentElement.SetAttribute("xmlns", AllowedSvgNamespace);
+            XmlAttribute namespaceAttribute = doc.CreateAttribute("xmlns");
+            namespaceAttribute.Value = SvgStandardNamespace;
+            
+            doc.DocumentElement.Attributes.Prepend(namespaceAttribute);
         }
 
         // Return the sanitised SVG as a string
@@ -132,5 +109,56 @@ public abstract class SvgSanitiser
         
         xmlWriter.Flush();
         return stringWriter.ToString();
+    }
+
+    private static void SanitizeSvgElementContent(XmlDocument doc)
+    {
+        if (doc.DocumentElement == null)
+        {
+            return;
+        }
+
+        // Start the recursive traversal from the document element
+        SanitizeXmlNode(doc.DocumentElement);
+    }
+    
+    private static void SanitizeXmlNode(XmlNode node)
+    {
+        if (node is not XmlElement element) return;
+        
+        var attributesToRemove = new List<XmlAttribute>();
+        foreach (XmlAttribute attribute in element.Attributes)
+        {
+            if (!AllowedSvgAttributes.Contains(attribute.LocalName))
+            {
+                attributesToRemove.Add(attribute);
+            }
+        }
+
+        foreach (XmlAttribute attribute in attributesToRemove)
+        {
+            element.Attributes.Remove(attribute);
+        }
+
+        // Remove elements not in the allowed list
+        var childNodesToRemove = new List<XmlNode>();
+        foreach (XmlNode child in element.ChildNodes)
+        {
+            if (child is XmlElement childElement && !AllowedSvgTags.Contains(childElement.LocalName))
+            {
+                childNodesToRemove.Add(child);
+            }
+        }
+
+        foreach (XmlNode child in childNodesToRemove)
+        {
+            element.RemoveChild(child);
+        }
+
+        // Recursively process child nodes
+        foreach (XmlNode child in element.ChildNodes)
+        {
+            SanitizeXmlNode(child);
+        }
     }
 }

@@ -10,12 +10,12 @@ namespace Costasdev.SafeSvg;
 /// This class is designed to handle potential vulnerabilities in SVG content arising from
 /// malicious or malformed input.
 /// </summary>
-public abstract class SvgSanitiser
+public sealed class SvgSanitiser
 {
     private static readonly string[] AllowedSvgTags =
     [
         "svg", "g", "path", "circle", "rect", "line", "polyline", "polygon",
-        "ellipse", "text", "tspan"
+        "ellipse", "text", "tspan", "style"
     ];
 
     private static readonly string[] AllowedSvgAttributes =
@@ -28,9 +28,26 @@ public abstract class SvgSanitiser
 
     private const string SvgStandardNamespace = "http://www.w3.org/2000/svg";
 
+    private readonly SanitiserOptions _options;
+    
     /// <summary>
-    /// Sanitises the input SVG content by removing any disallowed elements and attributes,
-    /// and optionally adding a namespace if required.
+    /// Initialises a new instance of the <see cref="SvgSanitiser"/> class with the specified sanitisation options.
+    /// </summary>
+    /// <param name="options"></param>
+    public SvgSanitiser(SanitiserOptions options)
+    {
+        _options = options;
+    }
+    
+    /// <summary>
+    /// Initialises a new instance of the <see cref="SvgSanitiser"/> class with default sanitisation options.
+    /// </summary>
+    public SvgSanitiser() : this(SanitiserOptions.Default)
+    {
+    }
+    
+    /// <summary>
+    /// Sanitises the provided SVG content by removing any disallowed elements and attributes.
     /// </summary>
     /// <param name="content">The SVG content to sanitise as a string.</param>
     /// <param name="options">The sanitisation options to apply, or null to use default options.</param>
@@ -38,7 +55,19 @@ public abstract class SvgSanitiser
     public static string? Sanitise(string content, SanitiserOptions? options = null)
     {
         options ??= SanitiserOptions.Default;
-
+        
+        var sanitiser = new SvgSanitiser(options);
+        return sanitiser.CleanSvg(content);
+    }
+    
+    /// <summary>
+    /// Sanitises the provided SVG content by removing any disallowed elements and attributes, using the options
+    /// provided in the constructor.
+    /// </summary>
+    /// <param name="content">The SVG content to sanitise as a string.</param>
+    /// <returns>The sanitised SVG content as a string, or null if the input is invalid or cannot be sanitised.</returns>
+    public string? CleanSvg(string content)
+    {
         // Load the SVG content into an XmlDocument
         XmlDocument doc = new();
         try
@@ -46,8 +75,8 @@ public abstract class SvgSanitiser
             using var textReader = new StringReader(content);
             using var reader = XmlReader.Create(textReader, new XmlReaderSettings
             {
-                IgnoreWhitespace = options.IndentOutput,
-                IgnoreComments = options.RemoveComments,
+                IgnoreWhitespace = _options.IndentOutput,
+                IgnoreComments = _options.RemoveComments,
                 DtdProcessing = DtdProcessing.Ignore
             });
             
@@ -93,7 +122,7 @@ public abstract class SvgSanitiser
         }
         
         // If the SVG namespace is not defined, add it
-        if (options.AddNamespace && !doc.DocumentElement.HasAttribute("xmlns"))
+        if (_options.AddNamespace && !doc.DocumentElement.HasAttribute("xmlns"))
         {
             XmlAttribute namespaceAttribute = doc.CreateAttribute("xmlns");
             namespaceAttribute.Value = SvgStandardNamespace;
@@ -104,14 +133,14 @@ public abstract class SvgSanitiser
         // Return the sanitised SVG as a string
         using StringWriter stringWriter = new();
         using XmlTextWriter xmlWriter = new(stringWriter);
-        xmlWriter.Formatting = options.IndentOutput ? Formatting.Indented : Formatting.None;
+        xmlWriter.Formatting = _options.IndentOutput ? Formatting.Indented : Formatting.None;
         doc.WriteTo(xmlWriter);
         
         xmlWriter.Flush();
         return stringWriter.ToString();
     }
 
-    private static void SanitizeSvgElementContent(XmlDocument doc)
+    private void SanitizeSvgElementContent(XmlDocument doc)
     {
         if (doc.DocumentElement == null)
         {
@@ -122,7 +151,7 @@ public abstract class SvgSanitiser
         SanitizeXmlNode(doc.DocumentElement);
     }
     
-    private static void SanitizeXmlNode(XmlNode node)
+    private void SanitizeXmlNode(XmlNode node)
     {
         if (node is not XmlElement element) return;
         
@@ -130,6 +159,11 @@ public abstract class SvgSanitiser
         foreach (XmlAttribute attribute in element.Attributes)
         {
             if (!AllowedSvgAttributes.Contains(attribute.LocalName))
+            {
+                attributesToRemove.Add(attribute);
+            }
+            
+            if (_options.AllowStyle == false && attribute.LocalName == "style")
             {
                 attributesToRemove.Add(attribute);
             }
@@ -144,7 +178,17 @@ public abstract class SvgSanitiser
         var childNodesToRemove = new List<XmlNode>();
         foreach (XmlNode child in element.ChildNodes)
         {
-            if (child is XmlElement childElement && !AllowedSvgTags.Contains(childElement.LocalName))
+            if (child is not XmlElement childElement)
+            {
+                continue;
+            }
+            
+            if (!AllowedSvgTags.Contains(childElement.LocalName))
+            {
+                childNodesToRemove.Add(child);
+            }
+            
+            if (_options.AllowStyle == false && childElement.LocalName == "style")
             {
                 childNodesToRemove.Add(child);
             }

@@ -5,16 +5,33 @@ namespace Costasdev.SafeSvg;
 /// <summary>
 /// Represents options to configure the behaviour of the SVG sanitization process.
 /// </summary>
-public class SanitiserOptions
+public sealed class SanitiserOptions
 {
     /// <summary>
-    /// A default instance of <see cref="SanitiserOptions"/> with "sane" defaults.
+    /// Initialises a new instance of the <see cref="SanitiserOptions"/> class with default values.
     /// </summary>
-    public static readonly SanitiserOptions Default = new()
+    public SanitiserOptions()
+    {
+        AddNamespace = true;
+        IndentOutput = true;
+        RemoveComments = false;
+        AllowStyle = true;
+    }
+
+    /// <summary>
+    /// A predefined instance of <see cref="SanitiserOptions"/> with the default settings you'd get from the constructor.
+    /// </summary>
+    public static readonly SanitiserOptions Default = new();
+    
+    /// <summary>
+    /// A default instance of <see cref="SanitiserOptions"/> with "cautious" defaults.
+    /// </summary>
+    public static readonly SanitiserOptions Cautious = new()
     {
         AddNamespace = true,
         IndentOutput = true,
-        RemoveComments = true
+        RemoveComments = true,
+        AllowStyle = false
     };
     
     /// <summary>
@@ -35,4 +52,9 @@ public class SanitiserOptions
     /// Whether to remove comments from the SVG document.
     /// </summary>
     public bool RemoveComments { get; init; }
+    
+    /// <summary>
+    /// Whether to allow the style attribute and style element in the SVG document.
+    /// </summary>
+    public bool AllowStyle { get; init; }
 }

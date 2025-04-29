@@ -3,12 +3,12 @@
 [TestClass]
 public sealed class SanitiserTests
 {
-    private static SanitiserOptions DefaultOptions => new()
+    private static SanitiserOptions SanitiserTestOptions => new()
     {
-        AddNamespace = true,
         IndentOutput = false,
-        RemoveComments = true
     };
+    
+    private readonly SvgSanitiser _svg = new(SanitiserTestOptions);
     
     [TestMethod]
     public void GoodSvgDoesntChange()
@@ -17,7 +17,7 @@ public sealed class SanitiserTests
         const string goodSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(goodSvg, DefaultOptions);
+        var actual = _svg.CleanSvg(goodSvg);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -32,7 +32,7 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -47,7 +47,7 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -62,7 +62,7 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -77,7 +77,7 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -92,7 +92,7 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -107,7 +107,7 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);
@@ -123,7 +123,51 @@ public sealed class SanitiserTests
         const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon icon-tabler icons-tabler-outline icon-tabler-file-type-svg\"><g><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /><path d=\"M14 3v4a1 1 0 0 0 1 1h4\" /><path d=\"M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4\" /><path d=\"M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75\" /><path d=\"M10 15l2 6l2 -6\" /><path d=\"M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3\" /></g></svg>";
         
         // Act
-        var actual = SvgSanitiser.Sanitise(input, DefaultOptions);
+        var actual = _svg.CleanSvg(input);
+        
+        // Assert
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(expected, actual);
+    }
+    
+    [TestMethod]
+    public void TestStyleDisallowedRemovesIt()
+    {
+        // Arrange
+        SanitiserOptions options = new()
+        {
+            IndentOutput = false,
+            AllowStyle = false
+        };
+        SvgSanitiser sanitiser = new(options);
+        
+        const string input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><style>body { background-color: red; }</style><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
+        const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
+        
+        // Act
+        var actual = sanitiser.CleanSvg(input);
+        
+        // Assert
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(expected, actual);
+    }
+    
+    [TestMethod]
+    public void TestStyleAllowedKeepsIt()
+    {
+        // Arrange
+        SanitiserOptions options = new()
+        {
+            IndentOutput = false,
+            AllowStyle = true
+        };
+        SvgSanitiser sanitiser = new(options);
+        
+        const string input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><style>body { background-color: red; }</style><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
+        const string expected = "<svg xmlns=\"http://www.w3.org/2000/svg\"><style>body { background-color: red; }</style><path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /></svg>";
+        
+        // Act
+        var actual = sanitiser.CleanSvg(input);
         
         // Assert
         Assert.IsNotNull(actual);

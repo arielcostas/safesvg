@@ -2,16 +2,17 @@
 
 A free, libre and open-source tool to sanitise SVG content in .NET applications.
 
-[![Build status](https://img.shields.io/github/actions/workflow/status/arielcostas/safesvg/unit-tests-push.yml?branch=main&style=for-the-badge)](https://github.com/arielcostas/uuidv7/actions/workflows/unit-tests-push.yml)
-[![Nuget version](https://img.shields.io/nuget/v/Costasdev.Uuidv7?style=for-the-badge)](https://www.nuget.org/packages/Costasdev.Uuidv7)
-[![Licence](https://img.shields.io/github/license/arielcostas/uuidv7?style=for-the-badge)](https://github.com/arielcostas/uuidv7/blob/main/LICENCE)
+[![Build status](https://img.shields.io/github/actions/workflow/status/arielcostas/safesvg/unit-tests-push.yml?branch=main&style=for-the-badge)](https://github.com/arielcostas/safesvg/actions/workflows/unit-tests-push.yml)
+[![Nuget version](https://img.shields.io/nuget/v/Costasdev.SafeSvg?style=for-the-badge)](https://www.nuget.org/packages/Costasdev.Safesvg)
+[![Licence](https://img.shields.io/github/license/arielcostas/SafeSvg?style=for-the-badge)](https://github.com/arielcostas/safesvg/blob/main/LICENCE)
 
 ## Features
 
 - Removes potentially dangerous elements and attributes from SVG files (like `<script>` and `onload`).
 - Adds (by default, if missing) the SVG `xmlns` attribute to the root element.
 - Removes (by default) comments from the SVG content.
-- Supports .NET 8 and 9.
+- Optionally (opt-in) preserves styles
+- Supports .NET 8 and 10.
 
 ## Usage
 
@@ -20,7 +21,7 @@ A free, libre and open-source tool to sanitise SVG content in .NET applications.
    ```bash
    dotnet add package Costasdev.SafeSvg
    ```
-   
+
 2. Use the `SafeSvg` class to sanitise SVG content:
 
    ```csharp
@@ -30,7 +31,7 @@ A free, libre and open-source tool to sanitise SVG content in .NET applications.
     var safeSvg = SvgSanitiser.Sanitise(svgContent);
     Console.WriteLine(safeSvg); // <svg xmlns="http://www.w3.org/2000/svg"></svg>
     ```
-   
+
 3. You can also provide custom options:
 
    ```csharp
@@ -46,7 +47,7 @@ A free, libre and open-source tool to sanitise SVG content in .NET applications.
    var safeSvg = SvgSanitiser.Sanitise(svgContent, options);
    Console.WriteLine(safeSvg); // <svg xmlns="http://www.w3.org/2000/svg"><!-- Comment --></svg>
    ```
-   
+
 ## Licence
 
 This project is licensed under the BSD 3-Clause License. See the [LICENCE](LICENCE) file for details.

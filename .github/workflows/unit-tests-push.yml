@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet: [9.x, 8.x]
+        dotnet: [10.x, 8.x]
 
     steps:
       - name: Checkout code

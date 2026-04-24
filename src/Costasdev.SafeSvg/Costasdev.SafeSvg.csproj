@@ -16,7 +16,7 @@
         <PackageId>Costasdev.SafeSvg</PackageId>
         <Authors>Ariel Costas Guerrero</Authors>
         <Description>Simple SVG sanitizer for .NET</Description>
-        <Copyright>Copyright (c) 2025 Ariel Costas Guerrero</Copyright>
+        <Copyright>Copyright (c) 2025-2026 Ariel Costas Guerrero</Copyright>
         <PackageProjectUrl>https://github.com/arielcostas/safesvg</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/arielcostas/safesvg</RepositoryUrl>

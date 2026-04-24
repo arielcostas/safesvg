@@ -1,9 +1,5 @@
 name: "Release"
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 on:
   push:
     tags:
@@ -59,6 +55,7 @@ jobs:
     environment: release
     permissions:
       id-token: write
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
